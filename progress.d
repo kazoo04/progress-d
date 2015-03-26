@@ -35,7 +35,7 @@ class Progress
       if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) != -1) {
         column = ws.ws_col;
       }
-      if(column == 0) column = 20;
+      if(column == 0) column = default_width;
 
       return column;
     }
@@ -60,41 +60,38 @@ class Progress
     }
 
 
+    string progressbarText(string header_text, string footer_text) {
+      immutable auto ratio = cast(double)counter / iterations;
+      string result = "";
+
+      double bar_length = width - header_text.length - footer_text.length;
+      size_t i = 0;
+      for(; i < ratio * bar_length; i++) result ~= "o";
+      for(; i < bar_length; i++) result ~= " ";
+
+      return header_text ~ result ~ footer_text;
+    }
+
+
     void print() {
       immutable auto ratio = cast(double)counter / iterations;
-      auto eta_text = "--:--:-- ";
+      auto header = appender!string();
+      auto footer = appender!string();
 
-      // ETA
+      header.formattedWrite("%s %3d%% |", caption, cast(int)(ratio * 100));
+
       if(counter <= 1 || ratio == 0.0) {
+        footer.formattedWrite("| ETA --:--:--:");
       } else {
-        int eta_sec = calc_eta();
-        auto d = dur!"seconds"(eta_sec);
         int h, m, s;
-        d.split!("hours", "minutes", "seconds")(h, m, s);
-        auto writer = appender!string();
-        formattedWrite(writer, "%02d:%02d:%02d ", h, m, s);
-        eta_text = writer.data;
+        dur!"seconds"(calc_eta())
+          .split!("hours", "minutes", "seconds")(h, m, s);
+        footer.formattedWrite("| ETA %02d:%02d:%02d ", h, m, s);
       }
 
-      // header text
-      auto header_writer = appender!string();
-      formattedWrite(header_writer, "%s %3d%% |", caption, cast(int)(ratio * 100));
-      immutable auto title_text = header_writer.data;
-
-      // footer text
-      immutable auto eta_header_text = "| ETA: ";
-      immutable auto right_margin = eta_header_text.length + eta_text.length + 1;
-
-      write(title_text);
-
-      double current = ratio * width;
-      size_t i = title_text.length + 5;
-      auto bar_length = width - right_margin;
-      for(; i < current && i < bar_length; i++) write("o");
-      for(; i < bar_length; i++) write(" ");
-
-      write(eta_header_text, eta_text);
+      write(progressbarText(header.data, footer.data));
     }
+
 
     void update() {
       width = getTerminalWidth();
@@ -104,6 +101,7 @@ class Progress
       print();
       stdout.flush();
     }
+
 
   public:
 
