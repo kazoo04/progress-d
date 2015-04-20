@@ -1,4 +1,4 @@
-module arow;
+module progress;
 
 import std.stdio;
 import std.range;
