@@ -12,6 +12,7 @@ class Progress
   private:
 
     immutable static size_t default_width = 80;
+    size_t max_width = 40;
     size_t width = default_width;
 
     ulong start_time;
@@ -65,6 +66,9 @@ class Progress
       string result = "";
 
       double bar_length = width - header_text.length - footer_text.length;
+      if(bar_length > max_width && max_width > 0) {
+        bar_length = max_width;
+      }
       size_t i = 0;
       for(; i < ratio * bar_length; i++) result ~= "o";
       for(; i < bar_length; i++) result ~= " ";
@@ -115,6 +119,13 @@ class Progress
       size_t count(size_t val) {
         if(val > iterations) val = iterations;
         return counter = val;
+      }
+    }
+
+    @property {
+      size_t maxWidth() { return max_width; }
+      size_t maxWidth(size_t w) {
+        return max_width = w;
       }
     }
 
