@@ -144,13 +144,3 @@ class Progress
 
 }
 
-void main(string[] args) {
-  size_t iteration = 100;
-  Progress p = new Progress(iteration);
-  for(int i = 0; i < iteration; i++) {
-    p.next();
-    Thread.sleep(dur!("msecs")(80));
-  }
-  writeln();
-}
-
