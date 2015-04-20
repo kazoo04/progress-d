@@ -5,6 +5,11 @@ A simple progress bar library implemented in D lang.
 # Example
 
 ```d
+import std.stdio;
+import std.datetime;
+import core.thread;
+import progress;
+
 void main(string[] args) {
   size_t iteration = 100;
   Progress p = new Progress(iteration);

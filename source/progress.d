@@ -1,11 +1,11 @@
+module arow;
+
 import std.stdio;
 import std.range;
 import std.format;
 import std.datetime;
 import core.sys.posix.unistd;
 import core.sys.posix.sys.ioctl;
-
-import core.thread;
 
 class Progress
 {
@@ -19,15 +19,6 @@ class Progress
     string caption = "Progress";
     size_t iterations;
     size_t counter;
-
-
-    this(size_t iterations) {
-      if(iterations <= 0) iterations = 1;
-
-      counter = 0;
-      this.iterations = iterations;
-      start_time = Clock.currTime.toUnixTime;
-    }
 
 
     size_t getTerminalWidth() {
@@ -108,6 +99,14 @@ class Progress
 
 
   public:
+
+    this(size_t iterations) {
+      if(iterations <= 0) iterations = 1;
+
+      counter = 0;
+      this.iterations = iterations;
+      start_time = Clock.currTime.toUnixTime;
+    }
 
     @property {
       string title() { return caption; }
